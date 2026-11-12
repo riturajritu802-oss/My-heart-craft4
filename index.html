@@ -701,18 +701,28 @@ button .ripple {
 
         <input type="file" id="myVideo" accept="video/*">
 
-        <video id="videoPlayer" controls playsinline></video>
+<video
+    id="videoPlayer"
+    controls
+    playsinline
+    preload="metadata"
+    src="komal-video.mp4">
+</video>
 
-        <hr style="border:1px solid #ff6bdb; margin:25px 0;">
+<hr style="border:1px solid #ff6bdb; margin:25px 0;">
 
 <h2>🎶 Special Music For you ❤️</h2>
 
-<input type="file" id="musicInput" accept="audio/*">
+<p id="musicStatus">Tumhare liye special song ❤️</p>
 
+<audio
+    id="bgMusic"
+    controls
+    preload="metadata"
+    src="komal-song.m4a">
+</audio>
 
-
-<audio id="bgMusic"></audio>
-
+        
     </div>
 </div>
 
@@ -991,7 +1001,8 @@ button .ripple {
 <script>
 
 /* ELEMENTS */
-
+const bgMusic = document.getElementById("bgMusic");
+const musicStatus = document.getElementById("musicStatus");
 const songButton = document.getElementById("openSong");
 const songCard = document.getElementById("songCard");
 const friendshipWrapper = document.getElementById("friendshipWrapper");
@@ -1069,94 +1080,7 @@ songButton.addEventListener("click", function() {
 });
 
 
-/* VIDEO SAVE SYSTEM */
 
-const videoInput = document.getElementById("myVideo");
-const videoPlayer = document.getElementById("videoPlayer");
-const statusText = document.getElementById("status");
-
-let currentVideoURL = null;
-
-let videoDB;
-
-const request = indexedDB.open("KomalVideoDB", 1);
-
-request.onupgradeneeded = function(event) {
-
-    videoDB = event.target.result;
-
-    if (!videoDB.objectStoreNames.contains("videos")) {
-        videoDB.createObjectStore("videos");
-    }
-};
-
-request.onsuccess = function(event) {
-
-    videoDB = event.target.result;
-
-    const transaction = videoDB.transaction("videos", "readonly");
-    const store = transaction.objectStore("videos");
-    const getRequest = store.get("mySong");
-
-    getRequest.onsuccess = function() {
-
-        if (getRequest.result) {
-            showVideo(getRequest.result);
-            
-        }
-    };
-};
-
-request.onerror = function() {
-    statusText.textContent = "Video storage open nahi ho paya.";
-};
-
-
-function showVideo(file) {
-
-    if (currentVideoURL) {
-        URL.revokeObjectURL(currentVideoURL);
-    }
-
-    currentVideoURL = URL.createObjectURL(file);
-    videoPlayer.src = currentVideoURL;
-  videoInput.style.display = "none";
-  }
-
-
-
-videoInput.addEventListener("change", function() {
-
-    const file = videoInput.files[0];
-
-    if (!file) return;
-
-    if (!file.type.startsWith("video/")) {
-        statusText.textContent = "Please video file select karo.";
-        return;
-    }
-
-    showVideo(file);
-
-    if (!videoDB) {
-        statusText.textContent = "Video database ready nahi hai. Dobara try karo.";
-        return;
-    }
-
-    const transaction = videoDB.transaction("videos", "readwrite");
-    const store = transaction.objectStore("videos");
-
-    store.put(file, "mySong");
-
-    transaction.oncomplete = function() {
-        statusText.textContent = "Video save ho gaya! ❤️";
-    };
-
-    transaction.onerror = function() {
-        statusText.textContent = "Video save nahi ho paya.";
-    };
-
-});
 
 
 /* SECOND BUTTON - ONLY 2D SECTION OPEN */
@@ -1172,9 +1096,7 @@ openBtn.addEventListener("click", function() {
             "Music play nahi hua. Dobara button dabao ❤️";
     });
   }
-if (bgMusic.src) {
-    bgMusic.play();
-  }
+
     openBtn.textContent = "💖 Your Message Is Open!";
     openBtn.disabled = true;
 
