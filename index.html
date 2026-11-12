@@ -1164,6 +1164,14 @@ videoInput.addEventListener("change", function() {
 openBtn.addEventListener("click", function() {
 
     message.classList.add("show");
+  if (bgMusic.src) {
+    bgMusic.currentTime = 0;
+
+    bgMusic.play().catch(function(error) {
+        musicStatus.textContent =
+            "Music play nahi hua. Dobara button dabao ❤️";
+    });
+  }
 if (bgMusic.src) {
     bgMusic.play();
   }
